@@ -29,6 +29,30 @@ class BCICIV2a(BaseDataModule):
         # split the data
         splitted_ds = self.dataset.split("session")
         train_dataset, test_dataset = splitted_ds["0train"], splitted_ds["1test"]
+        print("=" * 80)
+        print("Train dataset type:", type(train_dataset))
+        print("Number of runs:", len(train_dataset.datasets))
+
+        run = train_dataset.datasets[0]
+
+        print("Run type:", type(run))
+        print("Available attributes:")
+        print(dir(run))
+
+        sample = run[0]
+
+        print("\nSample type:", type(sample))
+        print("Sample length:", len(sample))
+
+        for i, item in enumerate(sample):
+            print(f"\nItem {i}")
+            print("Type:", type(item))
+            if hasattr(item, "shape"):
+                print("Shape:", item.shape)
+            else:
+                print(item)
+
+        print("=" * 80)
 
         # load the data
         X = np.concatenate(
