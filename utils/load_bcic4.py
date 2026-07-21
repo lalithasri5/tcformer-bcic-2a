@@ -5,7 +5,6 @@ from braindecode.preprocessing import (
     Preprocessor,
     create_windows_from_events,
     preprocess,
-    scale,
 )
 
 
@@ -16,7 +15,7 @@ def load_bcic4(subject_ids: list, dataset: str = "2a", preprocessing_dict: Dict 
 
     preprocessors = [
         Preprocessor("pick_types", eeg=True, meg=False, stim=False, verbose=verbose),
-        Preprocessor(scale, factor=1e6, apply_on_array=True),
+        Preprocessor(lambda x: x * 1e6, apply_on_array=True),
         Preprocessor("resample", sfreq=preprocessing_dict["sfreq"], verbose=verbose)
     ]
 
