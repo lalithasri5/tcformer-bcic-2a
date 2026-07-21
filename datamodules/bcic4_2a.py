@@ -28,12 +28,7 @@ class BCICIV2a(BaseDataModule):
             self.prepare_data()
         # split the data
         splitted_ds = self.dataset.split("session")
-
-        print("Available sessions:", splitted_ds.keys())
-
-        train_dataset = None
-        test_dataset = None
-        raise Exception("Check session names")
+        train_dataset, test_dataset = splitted_ds["0train"], splitted_ds["1test"]
 
         # load the data
         X = np.concatenate(
@@ -76,8 +71,8 @@ class BCICIV2aTVT(BaseDataModule):
 
         # Split by session
         splitted_ds = self.dataset.split("session")
-        session1 = splitted_ds["session_T"]  # training + validation
-        session2 = splitted_ds["session_E"]  # testing only
+        session1 = splitted_ds["0train"]  # training + validation
+        session2 = splitted_ds["1test"]  # testing only
         
         # Load session 1 data
         X = np.concatenate([run.windows.load_data()._data for run in session1.datasets], axis=0)
