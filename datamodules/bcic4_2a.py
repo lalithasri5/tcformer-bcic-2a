@@ -32,9 +32,11 @@ class BCICIV2a(BaseDataModule):
 
         # load the data
         run = train_dataset.datasets[0]
-        print(type(run))
-        print(dir(run))
-        raise Exception("Inspect dataset")
+
+        print(type(run.raw))
+        print(dir(run.raw))
+
+        raise Exception("Inspect raw")
         y = np.concatenate([run.y for run in train_dataset.datasets], axis=0)
         X_test = np.concatenate(
             [run.windows.load_data()._data for run in test_dataset.datasets], axis=0)
