@@ -31,8 +31,10 @@ class BCICIV2a(BaseDataModule):
         train_dataset, test_dataset = splitted_ds["0train"], splitted_ds["1test"]
 
         # load the data
-        X = np.concatenate(
-            [run.windows.load_data()._data for run in train_dataset.datasets], axis=0)
+        run = train_dataset.datasets[0]
+        print(type(run))
+        print(dir(run))
+        raise Exception("Inspect dataset")
         y = np.concatenate([run.y for run in train_dataset.datasets], axis=0)
         X_test = np.concatenate(
             [run.windows.load_data()._data for run in test_dataset.datasets], axis=0)
