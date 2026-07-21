@@ -33,10 +33,17 @@ class BCICIV2a(BaseDataModule):
         # load the data
         run = train_dataset.datasets[0]
 
-        print(type(run.raw))
-        print(dir(run.raw))
+        sample = run[0]
 
-        raise Exception("Inspect raw")
+        print(type(sample))
+        print(len(sample))
+
+        for i, item in enumerate(sample):
+            print(f"Item {i}: type={type(item)}")
+        if hasattr(item, "shape"):
+            print(f"        shape={item.shape}")
+
+        raise Exception("Inspect sample")
         y = np.concatenate([run.y for run in train_dataset.datasets], axis=0)
         X_test = np.concatenate(
             [run.windows.load_data()._data for run in test_dataset.datasets], axis=0)
