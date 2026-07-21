@@ -6,7 +6,6 @@ from braindecode.preprocessing import (
     Preprocessor,
     create_windows_from_events,
     preprocess,
-    scale,
 )
 import numpy as np
 
@@ -34,7 +33,7 @@ def load_hgd(subject_ids: list, preprocessing_dict: Dict = None,
 
     preprocessors = [
         Preprocessor("pick_channels", ch_names=channels, verbose=verbose),
-        Preprocessor(scale, factor=1e6, apply_on_array=True),  # from uV to V
+        Preprocessor(lambda x: x * 1e6, apply_on_array=True),  # from uV to V
         Preprocessor("resample", sfreq=preprocessing_dict["sfreq"], verbose=verbose)
     ]
 
