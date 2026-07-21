@@ -28,7 +28,12 @@ class BCICIV2a(BaseDataModule):
             self.prepare_data()
         # split the data
         splitted_ds = self.dataset.split("session")
-        train_dataset, test_dataset = splitted_ds["session_T"], splitted_ds["session_E"]
+
+        print("Available sessions:", splitted_ds.keys())
+
+        train_dataset = None
+        test_dataset = None
+        raise Exception("Check session names")
 
         # load the data
         X = np.concatenate(
