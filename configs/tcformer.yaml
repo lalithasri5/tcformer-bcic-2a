@@ -67,7 +67,7 @@ model_kwargs:
   # Transformer parameters (Grouped query attention paramerters)
   q_heads : 4 
   kv_heads : 2 # number of kv groups
-  trans_depth: 5
+  trans_depth: 6
   trans_dropout: 0.4  # 0.4 and path drop = 0.25
 
   # TCN_head parameters 
