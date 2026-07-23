@@ -79,7 +79,7 @@ def train_and_test(config):
                 else DDPStrategy(find_unused_parameters=True), 
             logger=False,
             enable_checkpointing=False,
-            callbacks=[metrics_callback]
+            callbacks=[metrics_callback],
             log_every_n_steps=1,
             enable_progress_bar=True
         )
