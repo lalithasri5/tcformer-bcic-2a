@@ -45,27 +45,25 @@ class BaseDataModule(pl.LightningDataModule):
         raise NotImplementedError
 
     def train_dataloader(self) -> DataLoader:
-        return DataLoader(self.train_dataset,
-                          batch_size=self.preprocessing_dict["batch_size"],
-                          shuffle=True,
-                          num_workers=self.preprocessing_dict.get("num_workers", os.cpu_count() // 2),
-                          pin_memory=True,
-                          persistent_workers=True,          # ↩︎ keeps workers alive between epochs
-                          prefetch_factor=4,                 # ↩︎ each worker preloads 4 future batches                          
-                          collate_fn=make_collate_fn(self.preprocessing_dict)  # 👈 new
-                    )
+        return DataLoader(
+                           self.train_dataset,
+                           batch_size=self.preprocessing_dict["batch_size"],
+                           shuffle=True,
+                           num_workers=0,
+                           pin_memory=True,
+                           collate_fn=make_collate_fn(self.preprocessing_dict)
+)
 
     def val_dataloader(self) -> DataLoader:
         return self.test_dataloader()
 
     def test_dataloader(self) -> DataLoader:
-        return DataLoader(self.test_dataset,
-                          batch_size=self.preprocessing_dict["batch_size"],
-                          num_workers=self.preprocessing_dict.get("num_workers", os.cpu_count() // 2),
-                          pin_memory=True,
-                          persistent_workers=True,          # ↩︎ keeps workers alive between epochs
-                          prefetch_factor=4,                 # ↩︎ each worker preloads 4 future batches                          
-                        )
+        return DataLoader(
+                      self.test_dataset,
+                    batch_size=self.preprocessing_dict["batch_size"],
+                    num_workers=0,
+                    pin_memory=True,
+)
 
     @staticmethod
     # Method 1 (per-channel & per-timepoint) across samples

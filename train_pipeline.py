@@ -80,6 +80,8 @@ def train_and_test(config):
             logger=False,
             enable_checkpointing=False,
             callbacks=[metrics_callback]
+            log_every_n_steps=1,
+            enable_progress_bar=True
         )
 
         # Instantiate datamodule and model
