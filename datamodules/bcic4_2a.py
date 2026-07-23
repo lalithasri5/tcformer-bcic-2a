@@ -108,7 +108,7 @@ class BCICIV2aTVT(BaseDataModule):
     def val_dataloader(self) -> DataLoader:
         return DataLoader(self.val_dataset,
                           batch_size=self.preprocessing_dict["batch_size"],
-                          num_workers=self.preprocessing_dict.get("num_workers", os.cpu_count() // 2),
+                          num_workers=0,
                           pin_memory=True,
                         #   persistent_workers=True,          # ↩︎ keeps workers alive between epochs
                         #   prefetch_factor=4                 # ↩︎ each worker preloads 4 future batches                          
@@ -169,7 +169,7 @@ class BCICIV2aLOSO(BCICIV2a):
     def val_dataloader(self) -> DataLoader:
         return DataLoader(self.val_dataset,
                           batch_size=self.preprocessing_dict["batch_size"],
-                          num_workers=self.preprocessing_dict.get("num_workers", os.cpu_count() // 2),
+                          num_workers=0,
                           pin_memory=True,
                         #   persistent_workers=True,          # ↩︎ keeps workers alive between epochs
                         #   prefetch_factor=4                 # ↩︎ each worker preloads 4 future batches                          
