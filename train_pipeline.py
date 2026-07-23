@@ -1,4 +1,6 @@
 import os, time, yaml
+import gc
+import torch
 import numpy as np
 from pathlib import Path
 from datetime import datetime
@@ -91,13 +93,29 @@ def train_and_test(config):
         param_count = sum(p.numel() for p in model.parameters())
 
         # ---------------- TRAIN ----------------
+        print("=" * 70)
+        print(f"START TRAINING SUBJECT {subject_id}")
+        print("=" * 70)
+
         st_train = time.time()
         trainer.fit(model, datamodule=datamodule)
-        train_times.append((time.time() - st_train) / 60) # minutes
 
-        # ---------------- TEST -----------------
+        print("=" * 70)
+        print(f"FINISHED TRAINING SUBJECT {subject_id}")
+        print("=" * 70)
+
+        train_times.append((time.time() - st_train) / 60)
+
+        print("=" * 70)
+        print(f"START TESTING SUBJECT {subject_id}")
+        print("=" * 70)
+
         st_test = time.time()
         test_results = trainer.test(model, datamodule)
+
+        print("=" * 70)
+        print(f"FINISHED TESTING SUBJECT {subject_id}")
+        print("=" * 70)
         test_duration = time.time() - st_test
         test_times.append(test_duration)
 
@@ -109,6 +127,13 @@ def train_and_test(config):
         device_str = "cpu"
         lat_ms = measure_latency(model, input_shape, device=device_str)
         response_times.append(lat_ms)  # convert to seconds for summary helper
+
+        gc.collect()
+
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            print(f"GPU Allocated : {torch.cuda.memory_allocated()/1024**2:.2f} MB")
+            print(f"GPU Reserved  : {torch.cuda.memory_reserved()/1024**2:.2f} MB")
 
         # ---------------- METRICS --------------
         test_accs.append(test_results[0]["test_acc"])
