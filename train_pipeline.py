@@ -74,6 +74,7 @@ def train_and_test(config):
             devices = -1 if config.get("gpu_id", 0) == -1 else \
                 [config.get("gpu_id", 0)],
             num_sanity_val_steps=0,
+            limit_val_batches=0,
             accelerator="auto",
             strategy = "auto" if config.get("gpu_id", 0) != -1 
                 else DDPStrategy(find_unused_parameters=True), 
@@ -100,7 +101,12 @@ def train_and_test(config):
         print("=" * 70)
 
         st_train = time.time()
+
+        print(">>> BEFORE trainer.fit()")
+
         trainer.fit(model, datamodule=datamodule)
+
+        print(">>> AFTER trainer.fit()")
 
         print("=" * 70)
         print(f"FINISHED TRAINING SUBJECT {subject_id}")

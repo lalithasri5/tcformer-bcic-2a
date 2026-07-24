@@ -106,6 +106,17 @@ class ClassificationModule(pl.LightningModule):
     def test_step(self, batch, batch_idx):
         loss, acc = self.shared_step(batch, batch_idx, mode="test")
         return {"test_loss": loss, "test_acc": acc}
+    def on_train_epoch_start(self):
+        print(f"\n===== TRAIN EPOCH {self.current_epoch} START =====")
+
+    def on_train_epoch_end(self):
+        print(f"===== TRAIN EPOCH {self.current_epoch} END =====")
+
+    def on_validation_epoch_start(self):
+        print(f"----- VALIDATION {self.current_epoch} START -----")
+
+    def on_validation_epoch_end(self):
+        print(f"----- VALIDATION {self.current_epoch} END -----")
 
     # common logic
     def shared_step(self, batch, batch_idx, mode: str = "train"):
