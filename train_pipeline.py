@@ -74,7 +74,6 @@ def train_and_test(config):
             devices = -1 if config.get("gpu_id", 0) == -1 else \
                 [config.get("gpu_id", 0)],
             num_sanity_val_steps=0,
-            limit_val_batches=0,
             accelerator="auto",
             strategy = "auto" if config.get("gpu_id", 0) != -1 
                 else DDPStrategy(find_unused_parameters=True), 

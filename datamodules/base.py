@@ -54,8 +54,14 @@ class BaseDataModule(pl.LightningDataModule):
                            collate_fn=make_collate_fn(self.preprocessing_dict)
 )
 
-    def val_dataloader(self) -> DataLoader:
-        return self.test_dataloader()
+    def val_dataloader(self):
+        return DataLoader(
+            self.val_dataset,
+            batch_size=self.preprocessing_dict["batch_size"],
+            shuffle=False,
+            num_workers=0,
+            pin_memory=True,
+      )
 
     def test_dataloader(self) -> DataLoader:
         return DataLoader(

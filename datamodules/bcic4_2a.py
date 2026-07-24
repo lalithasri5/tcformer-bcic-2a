@@ -105,14 +105,14 @@ class BCICIV2aTVT(BaseDataModule):
         # self.test_dataset  = BaseDataModule._make_tensor_dataset(X_test, y_test, 
         #                                                          preprocessing_dict=self.preprocessing_dict, mode="test")
 
-    def val_dataloader(self) -> DataLoader:
-        return DataLoader(self.val_dataset,
-                          batch_size=self.preprocessing_dict["batch_size"],
-                          num_workers=0,
-                          pin_memory=True,
-                        #   persistent_workers=True,          # ↩︎ keeps workers alive between epochs
-                        #   prefetch_factor=4                 # ↩︎ each worker preloads 4 future batches                          
-                        )
+    def val_dataloader(self):
+        return DataLoader(
+            self.val_dataset,
+            batch_size=self.preprocessing_dict["batch_size"],
+            shuffle=False,
+            num_workers=0,
+            pin_memory=True,
+        )
 
 
 class BCICIV2aLOSO(BCICIV2a):
