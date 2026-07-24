@@ -48,7 +48,8 @@ class BCICIV2a(BaseDataModule):
 
         # make datasets
         self.train_dataset = BaseDataModule._make_tensor_dataset(X, y)
-        self.test_dataset = BaseDataModule._make_tensor_dataset(X_test, y_test)                                                                
+        self.test_dataset = BaseDataModule._make_tensor_dataset(X_test, y_test)
+
         # self.train_dataset = BaseDataModule._make_tensor_dataset(X, y, 
                                                                 #  preprocessing_dict=self.preprocessing_dict, mode="train")
         # self.test_dataset = BaseDataModule._make_tensor_dataset(X_test, y_test, 
@@ -70,6 +71,7 @@ class BCICIV2aTVT(BaseDataModule):
                                  preprocessing_dict=self.preprocessing_dict)
 
     def setup(self, stage: Optional[str] = None) -> None:
+        print("===== BCIC2a setup() CALLED =====")   # <-- Add here
         if self.dataset is None:
             self.prepare_data()
 
@@ -79,7 +81,10 @@ class BCICIV2aTVT(BaseDataModule):
         session2 = splitted_ds["1test"]  # testing only
         
         # Load session 1 data
-        X = np.concatenate([run.windows.load_data()._data for run in session1.datasets], axis=0)
+        X = np.concatenate(
+               [np.stack([run[i][0] for i in range(len(run))]) for run in session1.datasets],
+               axis=0,
+            )
         y = np.concatenate([run.y for run in session1.datasets], axis=0)
 
         # Split session 1: 80% train, 20% validation
@@ -87,7 +92,10 @@ class BCICIV2aTVT(BaseDataModule):
             X, y, test_size=0.2, random_state=self.preprocessing_dict.get("seed", 42), stratify=y)
 
         # Load session 2 as test set
-        X_test = np.concatenate([run.windows.load_data()._data for run in session2.datasets], axis=0)
+        X_test = np.concatenate(
+            [np.stack([run[i][0] for i in range(len(run))]) for run in session2.datasets],
+            axis=0,
+        )
         y_test = np.concatenate([run.y for run in session2.datasets], axis=0)
 
         # scale data
@@ -166,11 +174,11 @@ class BCICIV2aLOSO(BCICIV2a):
         # self.test_dataset  = BaseDataModule._make_tensor_dataset(X_test, y_test, 
         #                                                          preprocessing_dict=self.preprocessing_dict, mode="test")
 
-    def val_dataloader(self) -> DataLoader:
-        return DataLoader(self.val_dataset,
-                          batch_size=self.preprocessing_dict["batch_size"],
-                          num_workers=0,
-                          pin_memory=True,
-                        #   persistent_workers=True,          # ↩︎ keeps workers alive between epochs
-                        #   prefetch_factor=4                 # ↩︎ each worker preloads 4 future batches                          
-                        )
+    def val_dataloader(self):
+        return DataLoader(
+            self.val_dataset,
+            batch_size=self.preprocessing_dict["batch_size"],
+            shuffle=False,
+            num_workers=0,
+            pin_memory=True,
+      )
