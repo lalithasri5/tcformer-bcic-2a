@@ -55,13 +55,16 @@ class BaseDataModule(pl.LightningDataModule):
 )
 
     def val_dataloader(self):
+        if not hasattr(self, "val_dataset") or self.val_dataset is None:
+            return None
+
         return DataLoader(
             self.val_dataset,
             batch_size=self.preprocessing_dict["batch_size"],
             shuffle=False,
             num_workers=0,
             pin_memory=True,
-      )
+       )
 
     def test_dataloader(self) -> DataLoader:
         return DataLoader(
