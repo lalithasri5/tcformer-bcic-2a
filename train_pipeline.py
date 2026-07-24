@@ -227,12 +227,24 @@ def run():
 
     # Adjust training parameters based on LOSO setting
     if args.loso:
-        config["dataset_name"] = args.dataset + "_loso" 
-        config["max_epochs"] = config["max_epochs_loso_hgd"] if args.dataset == "hgd" else config["max_epochs_loso"]
+        config["dataset_name"] = args.dataset + "_loso"
+        config["max_epochs"] = (
+        config["max_epochs_loso_hgd"]
+        if args.dataset == "hgd"
+        else config["max_epochs_loso"]
+    )
         config["model_kwargs"]["warmup_epochs"] = config["model_kwargs"]["warmup_epochs_loso"]
     else:
-        config["dataset_name"] = args.dataset
-        config["max_epochs"] = config["max_epochs_2b"] if args.dataset == "bcic2b" else config["max_epochs"]
+        if args.dataset == "bcic2a":
+            config["dataset_name"] = "bcic2a_tvt"
+        else:
+            config["dataset_name"] = args.dataset
+
+        config["max_epochs"] = (
+            config["max_epochs_2b"]
+            if args.dataset == "bcic2b"
+            else config["max_epochs"]
+       )
 
     config["preprocessing"] = config["preprocessing"][args.dataset]
     config["preprocessing"]["z_scale"] = config["z_scale"]
