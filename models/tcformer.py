@@ -41,7 +41,7 @@ class MultiKernelConvBlock(nn.Module):
         self,
         n_channels: int,
         temp_kernel_lengths: tuple = (20, 32, 64),
-        F1: int = 40,
+        F1: int = 32,
         D: int = 2,
         pool_length_1: int = 8,
         pool_length_2: int = 7,
@@ -58,7 +58,7 @@ class MultiKernelConvBlock(nn.Module):
                 nn.ConstantPad2d((k//2-1, k//2, 0, 0) if k % 2 == 0 else (k//2, k//2, 0, 0), 0),
                 nn.Conv2d(1, F1, (1, k), bias=False),
                 nn.BatchNorm2d(F1),
-                # nn.ELU() 
+                nn.ELU() 
             )
             for k in temp_kernel_lengths
         ])
