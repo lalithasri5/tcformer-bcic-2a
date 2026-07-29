@@ -43,8 +43,8 @@ class MultiKernelConvBlock(nn.Module):
         temp_kernel_lengths: tuple = (20, 32, 64),
         F1: int = 32,
         D: int = 2,
-        pool_length_1: int = 8,
-        pool_length_2: int = 7,
+        pool_length_1: int = 6,
+        pool_length_2: int = 6,
         dropout: float = 0.4,
         d_group: int = 16,
         use_group_attn: bool = True,
@@ -98,7 +98,7 @@ class MultiKernelConvBlock(nn.Module):
 
         # Grouped temporal convolution (1 × 16) per group
         self.temporal_conv_2 = nn.Sequential(
-            nn.Conv2d(self.d_model, self.d_model, (1, 24), padding='same',
+            nn.Conv2d(self.d_model, self.d_model, (1, 16), padding='same',
                        bias=False, groups=n_groups),
             nn.BatchNorm2d(self.d_model),
             nn.ELU(),
