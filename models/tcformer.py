@@ -40,7 +40,7 @@ class MultiKernelConvBlock(nn.Module):
     def __init__(
         self,
         n_channels: int,
-        temp_kernel_lengths: tuple = (16, 32, 64),
+        temp_kernel_lengths: tuple = (12, 24, 48),
         F1: int = 32,
         D: int = 2,
         pool_length_1: int = 8,
