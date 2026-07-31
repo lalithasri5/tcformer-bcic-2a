@@ -42,7 +42,7 @@ class MultiKernelConvBlock(nn.Module):
         n_channels: int,
         temp_kernel_lengths: tuple = (20, 32, 64),
         F1: int = 32,
-        D: int = 2,
+        D: int = 3,
         pool_length_1: int = 8,
         pool_length_2: int = 7,
         dropout: float = 0.4,
