@@ -75,9 +75,9 @@ model_kwargs:
   kernel_length_tcn: 4
   dropout_tcn: 0.3
   
-  lr: 0.001
+  lr: 0.0009
   beta_1: 0.5 
-  weight_decay: 0.005
+  weight_decay: 0.003
   optimizer: "adam"
   scheduler: True
   warmup_epochs: 20  
