@@ -27,7 +27,6 @@ from .modules import CausalConv1d, Conv1dWithConstraint
 from .channel_group_attention import ChannelGroupAttention
 from utils.weight_initialization import glorot_weight_zero_bias
 from utils.latency  import measure_latency
-from .eca import ECABlock
 
 
 # ------------------------------------------------------------------------------- #
@@ -86,7 +85,6 @@ class MultiKernelConvBlock(nn.Module):
             nn.BatchNorm2d(F2),
             nn.ELU(),
         )
-        self.eca = ECABlock(F2)
         self.pool1 = nn.AvgPool2d((1, pool_length_1))
         self.drop1 = nn.Dropout(dropout)
         
@@ -133,7 +131,6 @@ class MultiKernelConvBlock(nn.Module):
         
         # EEG channel depth-wise conv
         x = self.channel_DW_conv(x)       
-        x = self.eca(x)
         x = self.pool1(x)                                # temporal pooling
         x = self.drop1(x)                                # dropout
 
