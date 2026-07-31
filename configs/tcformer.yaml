@@ -65,7 +65,7 @@ model_kwargs:
   use_group_attn: True 
 
   # Transformer parameters (Grouped query attention paramerters)
-  q_heads : 8 
+  q_heads : 4
   kv_heads : 2 # number of kv groups
   trans_depth: 6
   trans_dropout: 0.4  # 0.4 and path drop = 0.25
