@@ -98,7 +98,7 @@ class MultiKernelConvBlock(nn.Module):
 
         # Grouped temporal convolution (1 × 16) per group
         self.temporal_conv_2 = nn.Sequential(
-            nn.Conv2d(self.d_model, self.d_model, (1, 16), padding='same',
+            nn.Conv2d(self.d_model, self.d_model, (1, 12), padding='same',
                        bias=False, groups=n_groups),
             nn.BatchNorm2d(self.d_model),
             nn.ELU(),
