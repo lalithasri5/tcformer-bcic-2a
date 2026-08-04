@@ -27,7 +27,6 @@ from .modules import CausalConv1d, Conv1dWithConstraint
 from .channel_group_attention import ChannelGroupAttention
 from utils.weight_initialization import glorot_weight_zero_bias
 from utils.latency  import measure_latency
-from .relative_position_bias import RelativePositionBias
 
 
 # ------------------------------------------------------------------------------- #
@@ -287,7 +286,7 @@ def _rope(q: Tensor, k: Tensor, cos: Tensor, sin: Tensor):  # q/k: (B, h, T, d)
 #  Grouped‑Query Self‑Attention (GQA) with RoPE
 class _GQAttention(nn.Module):
     """Grouped‑Query Attention (num_q_heads >= num_kv_heads)."""
-    def __init__(self, d_model: int, num_q_heads: int, num_kv_heads: int, dropout: float = 0.3,max_position: int = 128,):
+    def __init__(self, d_model: int, num_q_heads: int, num_kv_heads: int, dropout: float = 0.3,):
         super().__init__()
         assert d_model % num_q_heads == 0, "d_model must divide num_q_heads"
         assert num_q_heads % num_kv_heads == 0, "q_heads must be multiple of kv_heads"
@@ -300,10 +299,6 @@ class _GQAttention(nn.Module):
         self.kv_proj = nn.Linear(d_model, 2 * num_kv_heads * self.head_dim, bias=False)
         self.o_proj = nn.Linear(d_model, d_model, bias=False)
         self.drop = nn.Dropout(dropout)
-        self.rpb = RelativePositionBias(
-        num_heads=num_q_heads,
-        max_position=max_position,
-   )
         _xavier_zero_bias(self)
 
     def forward(self, x: Tensor, cos: Tensor, sin: Tensor) -> Tensor:  # x (B,T,C)
@@ -320,28 +315,13 @@ class _GQAttention(nn.Module):
         q, k = _rope(q, k, cos[:T, :], sin[:T, :])
         # Attention
         # -------------------------
-# Attention logits
-# -------------------------
         attn = (q @ k.transpose(-2, -1)) * self.scale
 
-# -------------------------
-# Relative Position Bias
-# -------------------------
-        bias = self.rpb(T)
-
-        attn = attn + bias.unsqueeze(0)
-
-# -------------------------
-# Softmax
-# -------------------------
-        attn = torch.softmax(attn, dim=-1)
+        attn = attn.softmax(dim=-1)
 
         attn = self.drop(attn)
 
-# -------------------------
-# Weighted sum
-# -------------------------
-        out = attn @ v                                 # (B,h,T,d)
+        out = attn @ v                         # (B,h,T,d)
         out = out.transpose(1, 2).contiguous().view(B, T, C)
         return self.o_proj(out)
 
@@ -380,7 +360,7 @@ class _TransformerBlock(nn.Module):
     def __init__(self, d_model: int, q_heads: int, kv_heads: int, mlp_ratio: int = 2, dropout=0.4, drop_path_rate=0.25):
         super().__init__()
         self.norm1 = nn.LayerNorm(d_model)
-        self.attn = _GQAttention(d_model, q_heads, kv_heads, dropout,max_position=128,)
+        self.attn = _GQAttention(d_model, q_heads, kv_heads, dropout)
         #self.drop_path = nn.Dropout(dropout)
         self.drop_path   = DropPath(drop_path_rate)  # for stochastic depth
         self.norm2 = nn.LayerNorm(d_model)
