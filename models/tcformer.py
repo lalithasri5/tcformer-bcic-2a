@@ -27,7 +27,7 @@ from .modules import CausalConv1d, Conv1dWithConstraint
 from .channel_group_attention import ChannelGroupAttention
 from utils.weight_initialization import glorot_weight_zero_bias
 from utils.latency  import measure_latency
-from .simam import SimAM
+from .geglu import GEGLU
 
 
 # ------------------------------------------------------------------------------- #
@@ -98,46 +98,18 @@ class MultiKernelConvBlock(nn.Module):
                 )
 
         # Grouped temporal convolution (1 × 16) per group
-        self.temporal_conv_2 = nn.ModuleList([
-            nn.Sequential(
-                nn.Conv2d(
-                    self.d_model,
+        self.temporal_conv_2 = nn.Sequential(
+            nn.Conv2d(
                 self.d_model,
-                kernel_size=(1,8),
-                padding="same",
+                self.d_model,
+                (1,16),
+                padding='same',
                 bias=False,
-                groups=n_groups,
-                ), 
-                nn.BatchNorm2d(self.d_model),
-                nn.ELU(),
+                groups=n_groups
             ),
-
-            nn.Sequential(
-                nn.Conv2d(
-                    self.d_model,
-                self.d_model,
-                kernel_size=(1,16),
-                padding="same",
-                bias=False,
-                groups=n_groups,
-        ),
-                nn.BatchNorm2d(self.d_model),
-                nn.ELU(),
-            ),
-
-            nn.Sequential(
-                nn.Conv2d(
-                self.d_model,
-                self.d_model,
-            kernel_size=(1,32),
-            padding="same",
-            bias=False,
-            groups=n_groups,
-            ),
-                nn.BatchNorm2d(self.d_model),
-                nn.ELU(),
-            ),
-     ])
+            nn.BatchNorm2d(self.d_model),
+            nn.ELU(),
+       )
 
         # Enable grouped attention only if multiple groups are used (two temp kernels or more)
         self.use_group_attn = False if n_groups == 1 else use_group_attn
@@ -174,9 +146,7 @@ class MultiKernelConvBlock(nn.Module):
             x = self.channel_reduction_2(x)
        
         # Grouped Temporal Convolution (1 × 16) applied independently to each group
-        features = [conv(x) for conv in self.temporal_conv_2]
-
-        x = torch.stack(features, dim=0).mean(dim=0)                    
+        x = self.temporal_conv_2(x)                    
         
         # Group attention (optional) 
         if self.use_group_attn:        
@@ -401,12 +371,12 @@ class _TransformerBlock(nn.Module):
         #self.drop_path = nn.Dropout(dropout)
         self.drop_path   = DropPath(drop_path_rate)  # for stochastic depth
         self.norm2 = nn.LayerNorm(d_model)
-        self.mlp = nn.Sequential(
-            nn.Linear(d_model, mlp_ratio * d_model),    # expands per-token features
-            nn.GELU(),                                      # non-linearity
-            nn.Linear(mlp_ratio * d_model, d_model),    # compresses back to d_model
-            nn.Dropout(dropout),                            # dropout# regularisation
-        )
+        ##############
+        self.mlp = GEGLU(
+            d_model,
+            mlp_ratio * d_model,
+            dropout,
+       )
     def forward(self, x: Tensor, cos: Tensor, sin: Tensor) -> Tensor:
         x = x + self.drop_path(self.attn(self.norm1(x), cos, sin))
         x = x + self.drop_path(self.mlp(self.norm2(x)))
