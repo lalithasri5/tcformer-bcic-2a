@@ -71,7 +71,7 @@ model_kwargs:
   trans_dropout: 0.4  # 0.4 and path drop = 0.25
 
   # TCN_head parameters 
-  tcn_depth: 3
+  tcn_depth: 2
   kernel_length_tcn: 4
   dropout_tcn: 0.3
   

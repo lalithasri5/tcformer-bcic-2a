@@ -85,6 +85,16 @@ class MultiKernelConvBlock(nn.Module):
             nn.Conv2d(F1 * n_groups, F2, (n_channels, 1), bias=False, groups=F1 * n_groups),
             nn.BatchNorm2d(F2),
             nn.ELU(),
+
+             # NEW Pointwise Convolution
+            nn.Conv2d(
+                F2,
+                F2,
+                kernel_size=1,
+                bias=False,
+            ),
+            nn.BatchNorm2d(F2),
+            nn.ELU(),
         )
         self.pool1 = nn.AvgPool2d((1, pool_length_1))
         self.drop1 = nn.Dropout(dropout)
