@@ -39,7 +39,7 @@ class ChannelGroupAttention(nn.Module):
         # For (B, G, 1, 1) tensors, nn.Conv2d(C, G, kernel_size=1) is equivalent to nn.Linear(C, G)
         self.att_fc1 = nn.Conv2d(in_channels, in_channels // reduction, kernel_size=1, groups=num_groups, bias=False)
         self.att_fc2 = nn.Conv2d(in_channels // reduction, num_groups, kernel_size=1, groups=num_groups, bias=False)
-        self.relu = nn.ReLU()           
+        self.relu = nn.GELU()           
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
