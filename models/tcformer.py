@@ -27,6 +27,7 @@ from .modules import CausalConv1d, Conv1dWithConstraint
 from .channel_group_attention import ChannelGroupAttention
 from utils.weight_initialization import glorot_weight_zero_bias
 from utils.latency  import measure_latency
+from .simam import SimAM
 
 
 # ------------------------------------------------------------------------------- #
@@ -111,6 +112,7 @@ class MultiKernelConvBlock(nn.Module):
                 in_channels=self.d_model,
                 num_groups=n_groups, 
             )
+            self.simam = SimAM()
         
         self.pool2 = nn.AvgPool2d((1, pool_length_2))
         self.drop2 = nn.Dropout(dropout)
@@ -143,7 +145,8 @@ class MultiKernelConvBlock(nn.Module):
         
         # Group attention (optional) 
         if self.use_group_attn:        
-            x = x + self.group_attn(x)   # Residual connection 
+            x = x + self.group_attn(x)
+            x = self.simam(x)         # Residual connection 
         
         x = self.pool2(x)                                # temporal pooling
         x = self.drop2(x)                                # dropout
