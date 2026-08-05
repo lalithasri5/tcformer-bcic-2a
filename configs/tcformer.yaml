@@ -3,7 +3,7 @@ dataset_name: ""   # options: "bcic2a", "bcic2b", "bcic3", "reh_mi", or "hgd".
                    # Note: This value will be overridden if specified in train_test.py
                    # or if passed as a command-line argument (e.g., --dataset bcic2a).
                    
-subject_ids: "all" # options: "all", an integer (e.g., 1), or a list of integers (e.g., [1, 2, 3]).
+subject_ids: 1 # options: "all", an integer (e.g., 1), or a list of integers (e.g., [1, 2, 3]).
 max_epochs: 300
 max_epochs_2b: 500 # for bcic2b
 max_epochs_loso: 125  
@@ -71,7 +71,7 @@ model_kwargs:
   trans_dropout: 0.4  # 0.4 and path drop = 0.25
 
   # TCN_head parameters 
-  tcn_depth: 2
+  tcn_depth: 3
   kernel_length_tcn: 4
   dropout_tcn: 0.3
   

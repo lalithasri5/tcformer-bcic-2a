@@ -33,8 +33,7 @@ class ChannelGroupAttention(nn.Module):
         """
         
         # Global Average Pooling to [B, C, 1, 1]
-        self.avgpool = nn.AdaptiveAvgPool2d(1)
-        self.maxpool = nn.AdaptiveMaxPool2d(1)
+        self.pool = nn.AdaptiveAvgPool2d(1)
         # Project to 1 value per group (using grouped conv!)
         # Using Conv2d with kernel size 1 acts like a Linear layer on (B, G, 1, 1) tensors
         # For (B, G, 1, 1) tensors, nn.Conv2d(C, G, kernel_size=1) is equivalent to nn.Linear(C, G)
@@ -58,10 +57,8 @@ class ChannelGroupAttention(nn.Module):
                               f"configured in_channels ({self.in_channels})")
 
         # 1. Global Average Pool
-        avg = self.avgpool(x)
-        mx = self.maxpool(x)
 
-        pooled = avg + mx  # [B, C, 1, 1]  ← SQUEEZE
+        pooled = self.pool(x)  # [B, C, 1, 1]  ← SQUEEZE
 
         # 2. Compress to per-group attention: [B, num_groups, 1, 1]
         group_att = self.att_fc1(pooled) # [B, C/r, 1, 1] grouped 1×1 conv
