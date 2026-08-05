@@ -27,7 +27,6 @@ from .modules import CausalConv1d, Conv1dWithConstraint
 from .channel_group_attention import ChannelGroupAttention
 from utils.weight_initialization import glorot_weight_zero_bias
 from utils.latency  import measure_latency
-from .geglu import GEGLU
 
 
 # ------------------------------------------------------------------------------- #
@@ -371,12 +370,12 @@ class _TransformerBlock(nn.Module):
         #self.drop_path = nn.Dropout(dropout)
         self.drop_path   = DropPath(drop_path_rate)  # for stochastic depth
         self.norm2 = nn.LayerNorm(d_model)
-        ##############
-        self.mlp = GEGLU(
-            d_model,
-            mlp_ratio * d_model,
-            dropout,
-       )
+        self.mlp = nn.Sequential(
+            nn.Linear(d_model, mlp_ratio * d_model),
+            nn.GELU(),
+            nn.Linear(mlp_ratio * d_model, d_model),
+            nn.Dropout(dropout),
+        )
     def forward(self, x: Tensor, cos: Tensor, sin: Tensor) -> Tensor:
         x = x + self.drop_path(self.attn(self.norm1(x), cos, sin))
         x = x + self.drop_path(self.mlp(self.norm2(x)))
