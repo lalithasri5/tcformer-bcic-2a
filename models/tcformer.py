@@ -146,7 +146,7 @@ class MultiKernelConvBlock(nn.Module):
         # Group attention (optional) 
         if self.use_group_attn:        
             x = x + self.group_attn(x)
-            x = self.simam(x)         # Residual connection 
+            x = x + self.simam(x)         # Residual connection 
         
         x = self.pool2(x)                                # temporal pooling
         x = self.drop2(x)                                # dropout
