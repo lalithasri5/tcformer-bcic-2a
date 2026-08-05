@@ -450,8 +450,6 @@ class TCFormerModule(nn.Module):
             nn.BatchNorm1d(d_group),
             nn.SiLU(),
         )
-        # Learnable fusion weights
-        self.fusion_weights = nn.Parameter(torch.tensor([0.5, 0.5]))
         self.tcn_head = TCNHead(d_group*(self.n_groups+1), (self.n_groups+1), tcn_depth, 
                                 kernel_length_tcn, dropout_tcn, n_classes)
 
@@ -467,11 +465,6 @@ class TCFormerModule(nn.Module):
         for blk in self.transformer:
             tokens = blk(tokens, cos, sin)
         tran_features = self.reduce(tokens)
-
-        weights = torch.softmax(self.fusion_weights, dim=0)
-
-        conv_features = weights[0] * conv_features
-        tran_features = weights[1] * tran_features
 
         features = torch.cat((conv_features, tran_features), dim=1) 
         out = self.tcn_head(features)
