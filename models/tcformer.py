@@ -82,7 +82,7 @@ class MultiKernelConvBlock(nn.Module):
         F2 = self.d_model * D if self.use_channel_reduction_1 else F1 * n_groups * D 
         hidden_dim = F2 * 2
 
-       self.channel_DW_conv = nn.Sequential(
+        self.channel_DW_conv = nn.Sequential(
 
     # Depthwise Convolution
         nn.Conv2d(
