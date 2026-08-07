@@ -80,41 +80,17 @@ class MultiKernelConvBlock(nn.Module):
             
         # Depth-wise convolution across EEG channels
         F2 = self.d_model * D if self.use_channel_reduction_1 else F1 * n_groups * D 
-        hidden_dim = F2 * 2
-
         self.channel_DW_conv = nn.Sequential(
-
-    # Depthwise Convolution
-        nn.Conv2d(
+            nn.Conv2d(
             F1 * n_groups,
-        F2,
-        kernel_size=(n_channels, 1),
-        groups=F1 * n_groups,
-        bias=False,
-        ),
-        nn.BatchNorm2d(F2),
-        nn.ELU(),
-
-    # Pointwise Expansion
-        nn.Conv2d(
-        F2,
-        hidden_dim,
-        kernel_size=1,
-        bias=False,
-        ),
-        nn.BatchNorm2d(hidden_dim),
-        nn.ELU(),
-
-    # Pointwise Reduction
-        nn.Conv2d(
-        hidden_dim,
-        F2,
-        kernel_size=1,
-        bias=False,
-        ),
-        nn.BatchNorm2d(F2),
-        nn.ELU(),
-    )
+            F2,
+            (n_channels, 1),
+            bias=False,
+            groups=F1 * n_groups,
+         ),
+            nn.BatchNorm2d(F2),
+            nn.ELU(),
+      )
         self.pool1 = nn.AvgPool2d((1, pool_length_1))
         self.drop1 = nn.Dropout(dropout)
         
