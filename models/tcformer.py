@@ -110,7 +110,7 @@ class MultiKernelConvBlock(nn.Module):
                 (1,16),
                 padding='same',
                 bias=False,
-                groups=n_groups
+                groups=1
             ),
             nn.BatchNorm2d(self.d_model),
             nn.ELU(),
