@@ -33,6 +33,8 @@ class BCICIV2b(BaseDataModule):
             splitted_ds[f"session_{session}"]
             for session in [0, 1, 2]
         ]
+        splitted_ds = self.dataset.split("session")
+        print("2B SESSION KEYS:", splitted_ds.keys())
 
         test_datasets = [
             splitted_ds[f"session_{session}"]
