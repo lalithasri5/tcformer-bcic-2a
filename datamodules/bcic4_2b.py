@@ -18,7 +18,7 @@ class BCICIV2b(BaseDataModule):
 
     def prepare_data(self) -> None:
         self.dataset = load_bcic4(
-            subject_ids=[self.subject_id],
+            subject_ids=[int(self.subject_id)],
             dataset="2b",
             preprocessing_dict=self.preprocessing_dict
         )
