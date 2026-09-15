@@ -30,15 +30,14 @@ class BCICIV2b(BaseDataModule):
         splitted_ds = self.dataset.split("session")
 
         train_datasets = [
-            splitted_ds[f"session_{session}"]
-            for session in [0, 1, 2]
+            splitted_ds["0train"],
+            splitted_ds["1train"],
+            splitted_ds["2train"],
         ]
-        splitted_ds = self.dataset.split("session")
-        print("2B SESSION KEYS:", splitted_ds.keys())
 
         test_datasets = [
-            splitted_ds[f"session_{session}"]
-            for session in [3, 4]
+            splitted_ds["3test"],
+            splitted_ds["4test"],
         ]
 
         X = np.concatenate(
@@ -94,7 +93,7 @@ class BCICIV2bLOSO(BCICIV2b):
 
     def prepare_data(self) -> None:
         self.dataset = load_bcic4(
-           subject_ids=[int(s) for s in self.all_subject_ids],
+            subject_ids=[int(s) for s in self.all_subject_ids],
             dataset="2b",
             preprocessing_dict=self.preprocessing_dict
         )
@@ -112,22 +111,19 @@ class BCICIV2bLOSO(BCICIV2b):
         ]
 
         train_datasets = [
-            splitted_ds[str(subj_id)]
-            .split("session")[f"session_{session}"]
+            splitted_ds[str(subj_id)].split("session")[f"{session}train"]
             for subj_id in train_subjects
             for session in [0, 1, 2]
         ]
 
         val_datasets = [
-            splitted_ds[str(subj_id)]
-            .split("session")[f"session_{session}"]
+            splitted_ds[str(subj_id)].split("session")[f"{session}test"]
             for subj_id in train_subjects
             for session in [3, 4]
         ]
 
         test_datasets = [
-            splitted_ds[str(self.subject_id)]
-            .split("session")[f"session_{session}"]
+            splitted_ds[str(self.subject_id)].split("session")[f"{session}test"]
             for session in [3, 4]
         ]
 
