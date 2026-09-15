@@ -92,7 +92,7 @@ class BCICIV2bLOSO(BCICIV2b):
 
     def prepare_data(self) -> None:
         self.dataset = load_bcic4(
-            subject_ids=self.all_subject_ids,
+           subject_ids=[int(s) for s in self.all_subject_ids],
             dataset="2b",
             preprocessing_dict=self.preprocessing_dict
         )
