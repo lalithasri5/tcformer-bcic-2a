@@ -1,3 +1,12 @@
+from typing import Optional
+
+import numpy as np
+from torch.utils.data.dataloader import DataLoader
+
+from .base import BaseDataModule
+from utils.load_bcic4 import load_bcic4
+
+
 class BCICIV2b(BaseDataModule):
     all_subject_ids = list(range(1, 10))
     class_names = ["hand(L)", "hand(R)"]
@@ -18,7 +27,6 @@ class BCICIV2b(BaseDataModule):
         if self.dataset is None:
             self.prepare_data()
 
-        # Split the data
         splitted_ds = self.dataset.split("session")
 
         train_datasets = [
@@ -31,13 +39,9 @@ class BCICIV2b(BaseDataModule):
             for session in [3, 4]
         ]
 
-        # Load training data
         X = np.concatenate(
             [
-                np.stack([
-                    run[i][0]
-                    for i in range(len(run))
-                ])
+                np.stack([run[i][0] for i in range(len(run))])
                 for train_dataset in train_datasets
                 for run in train_dataset.datasets
             ],
@@ -53,13 +57,9 @@ class BCICIV2b(BaseDataModule):
             axis=0
         )
 
-        # Load test data
         X_test = np.concatenate(
             [
-                np.stack([
-                    run[i][0]
-                    for i in range(len(run))
-                ])
+                np.stack([run[i][0] for i in range(len(run))])
                 for test_dataset in test_datasets
                 for run in test_dataset.datasets
             ],
@@ -75,11 +75,9 @@ class BCICIV2b(BaseDataModule):
             axis=0
         )
 
-        # Scale data
         if self.preprocessing_dict["z_scale"]:
             X, X_test = BaseDataModule._z_scale(X, X_test)
 
-        # Make datasets
         self.train_dataset = BaseDataModule._make_tensor_dataset(X, y)
         self.test_dataset = BaseDataModule._make_tensor_dataset(
             X_test, y_test
@@ -103,7 +101,6 @@ class BCICIV2bLOSO(BCICIV2b):
         if self.dataset is None:
             self.prepare_data()
 
-        # Split by subject
         splitted_ds = self.dataset.split("subject")
 
         train_subjects = [
@@ -112,7 +109,6 @@ class BCICIV2bLOSO(BCICIV2b):
             if subj_id != self.subject_id
         ]
 
-        # Training data
         train_datasets = [
             splitted_ds[str(subj_id)]
             .split("session")[f"session_{session}"]
@@ -120,7 +116,6 @@ class BCICIV2bLOSO(BCICIV2b):
             for session in [0, 1, 2]
         ]
 
-        # Validation data
         val_datasets = [
             splitted_ds[str(subj_id)]
             .split("session")[f"session_{session}"]
@@ -128,20 +123,15 @@ class BCICIV2bLOSO(BCICIV2b):
             for session in [3, 4]
         ]
 
-        # Test data
         test_datasets = [
             splitted_ds[str(self.subject_id)]
             .split("session")[f"session_{session}"]
             for session in [3, 4]
         ]
 
-        # Load training data
         X = np.concatenate(
             [
-                np.stack([
-                    run[i][0]
-                    for i in range(len(run))
-                ])
+                np.stack([run[i][0] for i in range(len(run))])
                 for train_dataset in train_datasets
                 for run in train_dataset.datasets
             ],
@@ -157,13 +147,9 @@ class BCICIV2bLOSO(BCICIV2b):
             axis=0
         )
 
-        # Load validation data
         X_val = np.concatenate(
             [
-                np.stack([
-                    run[i][0]
-                    for i in range(len(run))
-                ])
+                np.stack([run[i][0] for i in range(len(run))])
                 for val_dataset in val_datasets
                 for run in val_dataset.datasets
             ],
@@ -179,13 +165,9 @@ class BCICIV2bLOSO(BCICIV2b):
             axis=0
         )
 
-        # Load test data
         X_test = np.concatenate(
             [
-                np.stack([
-                    run[i][0]
-                    for i in range(len(run))
-                ])
+                np.stack([run[i][0] for i in range(len(run))])
                 for test_dataset in test_datasets
                 for run in test_dataset.datasets
             ],
@@ -201,24 +183,14 @@ class BCICIV2bLOSO(BCICIV2b):
             axis=0
         )
 
-        # Scale data
         if self.preprocessing_dict["z_scale"]:
             X, X_val, X_test = BaseDataModule._z_scale_tvt(
                 X, X_val, X_test
             )
 
-        # Make datasets
-        self.train_dataset = BaseDataModule._make_tensor_dataset(
-            X, y
-        )
-
-        self.val_dataset = BaseDataModule._make_tensor_dataset(
-            X_val, y_val
-        )
-
-        self.test_dataset = BaseDataModule._make_tensor_dataset(
-            X_test, y_test
-        )
+        self.train_dataset = BaseDataModule._make_tensor_dataset(X, y)
+        self.val_dataset = BaseDataModule._make_tensor_dataset(X_val, y_val)
+        self.test_dataset = BaseDataModule._make_tensor_dataset(X_test, y_test)
 
     def val_dataloader(self) -> DataLoader:
         return DataLoader(
