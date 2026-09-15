@@ -5,7 +5,7 @@ dataset_name: ""   # options: "bcic2a", "bcic2b", "bcic3", "reh_mi", or "hgd".
                    
 subject_ids: "1" # options: "all", an integer (e.g., 1), or a list of integers (e.g., [1, 2, 3]).
 max_epochs: 300
-max_epochs_2b: 500 # for bcic2b
+max_epochs_2b: 300 # for bcic2b
 max_epochs_loso: 125  
 max_epochs_loso_hgd: 77  
 seed: 0 # Random seed for reproducibility. 
